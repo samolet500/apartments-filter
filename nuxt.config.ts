@@ -12,6 +12,9 @@ export default defineNuxtConfig({
       }
     }
   },
+  image: {
+    dir: 'assets/images'
+  },
   modules: [
     '@nuxt/eslint',
     '@nuxt/fonts',
