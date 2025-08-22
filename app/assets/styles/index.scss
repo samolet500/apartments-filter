@@ -1,0 +1,6 @@
+@use './fonts.scss';
+@use './variables.scss' as *;
+
+body {
+  font-family: $font-primary;
+}
