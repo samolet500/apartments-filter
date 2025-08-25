@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: false },
-  css: ['~/assets/styles/index.scss'],
+  css: ['~/assets/styles/index.scss', '@vueform/slider/themes/default.css'],
   vite: {
     css: {
       preprocessorOptions: {
