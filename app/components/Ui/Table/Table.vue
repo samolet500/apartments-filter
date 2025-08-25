@@ -43,8 +43,9 @@ const sortedRows = computed(() => {
 });
 
 // --- ВИДИМЫЕ КОЛОНКИ ---
-const displayedColumns = computed(() =>
-  props.columns.filter((col) => col.visible !== false)
+const displayedColumns = computed(
+  () => props.columns
+  //props.columns.filter((col) => col.visible !== false)
 );
 </script>
 
