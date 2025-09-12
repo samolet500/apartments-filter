@@ -56,6 +56,7 @@ function getSortClass(col: ITableColumn, order: 'asc' | 'desc') {
           <th
             v-for="col in displayedColumns"
             :key="col.prop"
+            :id="`th-${col.prop}`"
             :style="{
               width: col.width || 'auto',
             }"
@@ -86,6 +87,7 @@ function getSortClass(col: ITableColumn, order: 'asc' | 'desc') {
           <td
             v-for="col in displayedColumns"
             :key="col.prop"
+            :id="col.prop"
           >
             <slot
               :name="col.prop"

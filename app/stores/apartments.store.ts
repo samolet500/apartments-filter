@@ -29,8 +29,8 @@ export const useApartmentsStore = defineStore('apartments', () => {
   const isLoaded = ref(false)
 
   async function loadApartments() {
-    // Имитация задержки в 2 секунды
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Имитация задержки в 2 секунды, чтобы показать загрузку
+    await new Promise(resolve => setTimeout(resolve, 300));
 
     const data = await $fetch<IApartment[]>("/apartments.json")
     const adapterData = adapterApartmentData(data)
@@ -52,7 +52,7 @@ export const useApartmentsStore = defineStore('apartments', () => {
   function setAllData(data: IApartment[]) {
     allData.value = data
     columns.value = [
-      { label: 'ID', prop: 'id', visible: true },
+      { label: 'ID', prop: 'id', visible: false },
       { label: 'Планировка', prop: 'image', width: '80px' },
       { label: 'Квартира', prop: 'apartment', align: 'left' },
       { label: 'S, м²', prop: 'square', width: '120px', align: 'left', sortable: true },

@@ -16,27 +16,14 @@ onMounted(async () => {
 
         <!-- 🔹 Skeleton пока данные грузятся -->
         <div v-if="!store.isLoaded" class="apartments__skeleton">
-          <!-- Таблица -->
-          <div class="apartments__table">
-            <div v-for="i in 5" :key="'row-' + i" class="skeleton-row">
-              <div
-                v-for="j in 5"
-                :key="'cell-' + i + '-' + j"
-                class="skeleton-cell"
-              />
-            </div>
-          </div>
-
-          <!-- Фильтр -->
-          <div class="apartments__filter">
-            <div v-for="i in 3" :key="'filter-' + i" class="skeleton-filter" />
-          </div>
+          <UiSkeletonTable />
+          <UiSkeletonFilter class="apartments__skeleton-filter" />
         </div>
 
         <!-- 🔹 Основной контент -->
         <div v-else class="apartments__content">
           <!-- Таблица -->
-          <div class="apartments__table">
+          <div class="apartments__table-wrapper">
             <UiTable :data="store.displayedData" :columns="store.columns">
               <template #image="{ value }">
                 <NuxtImg
@@ -58,7 +45,6 @@ onMounted(async () => {
             <!-- Загрузить ещё -->
             <div v-if="store.hasMore" class="apartments__table-footer">
               <UiButton @click="store.loadMore">Загрузить ещё</UiButton>
-              <!-- <button class="" @click="store.loadMore">Загрузить ещё</button> -->
             </div>
           </div>
 
@@ -72,7 +58,7 @@ onMounted(async () => {
   </PageSection>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .apartments {
   &__title {
     margin: 0;
@@ -87,9 +73,13 @@ onMounted(async () => {
     justify-content: space-between;
     gap: 80px;
     margin-top: 48px;
+
+    @media (max-width: 1280px) {
+      gap: 28px;
+    }
   }
 
-  &__table {
+  &__table-wrapper {
     width: 100%;
   }
 
@@ -102,51 +92,95 @@ onMounted(async () => {
     margin-top: 48px;
   }
 
-  &__filter {
+  &__filter,
+  &__skeleton-filter {
     flex: 0 0 auto;
     width: 400px;
-    // height: 200px;
+
+    @media (max-width: 1280px) {
+      width: 318px;
+      margin-top: -100px;
+    }
   }
-}
 
-/* 🔹 Skeleton */
-.skeleton-row {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 12px;
-}
+  @media (max-width: 1280px) {
+    table {
+      display: block;
+      width: 100%;
+    }
 
-.skeleton-cell {
-  flex: 1;
-  height: 40px;
-  border-radius: 6px;
-  background: #e0e0e0;
-  animation: pulse 1.5s infinite ease-in-out;
-}
+    thead {
+      display: block;
+      width: 100%;
+    }
 
-.skeleton-filter {
-  margin-top: 20px;
-  height: 40px;
-  border-radius: 6px;
-  background: #e0e0e0;
-  animation: pulse 1.5s infinite ease-in-out;
-}
+    thead tr {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+    }
 
-.apartments__skeleton .apartments__filter {
-  background: #c6c6c6;
-  padding: 40px;
-  border-radius: 10px;
-}
+    #th-image,
+    #th-apartment {
+      display: none;
+    }
 
-@keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 1;
+    #th-square,
+    #th-floor,
+    #th-priceFormatted {
+      padding: 0;
+      border: none;
+    }
+
+    tbody {
+      display: block;
+      width: 100%;
+    }
+
+    tbody tr {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      grid-template-areas:
+        "apartment apartment apartment image" /* Квартира | Планировка */
+        "square floor priceFormatted image"; /* Площадь | Этаж | Цена */
+      gap: 8px;
+      padding: 16px 24px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+
+    // td[data-label="apartment"] {
+    #apartment {
+      grid-area: apartment;
+      padding: 0;
+      border-bottom: none;
+    }
+
+    #image {
+      grid-area: image;
+      padding: 0;
+      border-bottom: none;
+    }
+
+    #square {
+      grid-area: square;
+      padding: 0;
+      border-bottom: none;
+    }
+
+    #floor {
+      grid-area: floor;
+      padding: 0;
+      border-bottom: none;
+    }
+
+    #priceFormatted {
+      grid-area: priceFormatted;
+      padding: 0;
+      border-bottom: none;
+    }
   }
 }
 </style>
