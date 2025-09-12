@@ -1,156 +1,74 @@
 <script setup lang="ts">
-// колонки таблицы
-const columns = ref([
-  { label: "ID", prop: "id", width: "80px", align: "center", visible: false },
-  { label: "Планировка", prop: "image", width: "120px" },
-  { label: "Квартира", prop: "apartment", align: "left" },
-  {
-    label: "S, м²",
-    prop: "square",
-    width: "120px",
-    align: "left",
-    sortable: true,
-  },
-  {
-    label: "Этаж",
-    prop: "floor",
-    width: "120px",
-    align: "left",
-    sortable: true,
-  },
-  {
-    label: "Цена",
-    prop: "price",
-    width: "120px",
-    align: "left",
-    sortable: true,
-  },
-  { label: "Комнаты", prop: "rooms", width: "100px", align: "center" },
-]);
+import { useApartmentsStore } from "~/stores/apartments.store";
 
-// данные
-const allData = ref<any[]>([]);
-const filteredData = ref<any[]>([]);
-const displayedData = ref<any[]>([]);
-const itemsPerPage = ref(5);
-const currentPage = ref(1);
-const hasMore = ref(true);
+const store = useApartmentsStore();
 
-// фильтры
-const filterPrice = ref<[number, number]>([2000000, 10000000]);
-const filterSquare = ref<[number, number]>([30, 80]);
-const filterRooms = ref<number[]>([1, 2, 3, 4]);
-
-// загрузка JSON
 onMounted(async () => {
-  const res = await fetch("/apartments.json");
-  allData.value = await res.json();
-
-  // формируем поле apartment из rooms
-  allData.value = allData.value.map((item) => ({
-    ...item,
-    apartment: `${item.rooms}-комнатная №${item.apartment}`,
-  }));
-
-  // загружаем фильтры из localStorage
-  const savedFilters = localStorage.getItem("apartmentsFilters");
-  if (savedFilters) {
-    const { price, square, rooms } = JSON.parse(savedFilters);
-    filterPrice.value = price;
-    filterSquare.value = square;
-    filterRooms.value = rooms;
-  }
-
-  applyFilters();
+  await store.loadApartments();
 });
-
-// функция фильтрации
-function applyFilters() {
-  filteredData.value = allData.value.filter((item) => {
-    const priceOk =
-      item.price >= filterPrice.value[0] && item.price <= filterPrice.value[1];
-    const squareOk =
-      item.square >= filterSquare.value[0] &&
-      item.square <= filterSquare.value[1];
-    const roomsOk = filterRooms.value.includes(item.rooms);
-    return priceOk && squareOk && roomsOk;
-  });
-
-  const displayedCount = currentPage.value * itemsPerPage.value;
-  displayedData.value = filteredData.value.slice(0, displayedCount);
-  hasMore.value = displayedData.value.length < filteredData.value.length;
-}
-
-// обработка изменения фильтров
-function updateFilter(key: string, value: any) {
-  if (key === "price") filterPrice.value = value;
-  if (key === "square") filterSquare.value = value;
-  if (key === "rooms") filterRooms.value = value;
-
-  // сохраняем в localStorage
-  localStorage.setItem(
-    "apartmentsFilters",
-    JSON.stringify({
-      price: filterPrice.value,
-      square: filterSquare.value,
-      rooms: filterRooms.value,
-    })
-  );
-
-  applyFilters();
-}
-
-// подгрузка ещё
-function loadMore() {
-  currentPage.value += 1;
-  const displayedCount = currentPage.value * itemsPerPage.value;
-  displayedData.value = filteredData.value.slice(0, displayedCount);
-  hasMore.value = displayedData.value.length < filteredData.value.length;
-}
 </script>
 
 <template>
   <PageSection>
-    <div class="apartments">
-      <h1 class="apartments__title">Квартиры</h1>
+    <ClientOnly>
+      <div class="apartments">
+        <h1 class="apartments__title">Квартиры</h1>
 
-      <div class="apartments__content">
-        <!-- Таблица -->
-        <div class="apartments__table">
-          <UiTable :data="displayedData" :columns="columns">
-            <template #image="{ value }">
-              <NuxtImg :src="value" />
-            </template>
-          </UiTable>
-
-          <!-- кнопка "Загрузить ещё" -->
-          <div v-if="hasMore" class="flex justify-center mt-4">
-            <button
-              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              @click="loadMore"
-            >
-              Загрузить ещё
-            </button>
+        <!-- 🔹 Skeleton пока данные грузятся -->
+        <div v-if="!store.isLoaded" class="apartments__skeleton">
+          <!-- Таблица -->
+          <div class="apartments__table">
+            <div v-for="i in 5" :key="'row-' + i" class="skeleton-row">
+              <div
+                v-for="j in 5"
+                :key="'cell-' + i + '-' + j"
+                class="skeleton-cell"
+              />
+            </div>
           </div>
 
-          <div class="text-center text-gray-500 mt-2">
-            Показано {{ displayedData.length }} из {{ allData.length }}
+          <!-- Фильтр -->
+          <div class="apartments__filter">
+            <div v-for="i in 3" :key="'filter-' + i" class="skeleton-filter" />
           </div>
         </div>
 
-        <!-- Фильтр -->
-        <div class="apartments__filter">
-          <!-- Панель фильтров -->
-          <!-- Фильтры -->
-          <FiltersPanel
-            :valuePrice="filterPrice"
-            :valueSquare="filterSquare"
-            :valueRooms="filterRooms"
-            @update:filter="updateFilter"
-          />
+        <!-- 🔹 Основной контент -->
+        <div v-else class="apartments__content">
+          <!-- Таблица -->
+          <div class="apartments__table">
+            <UiTable :data="store.displayedData" :columns="store.columns">
+              <template #image="{ value }">
+                <NuxtImg
+                  v-if="typeof value === 'string' && value"
+                  class="apartments__table-image"
+                  :src="value as string"
+                />
+              </template>
+
+              <template #apartment="{ value }">
+                <div v-html="value" />
+              </template>
+
+              <template #floor="{ value }">
+                <div v-html="value" />
+              </template>
+            </UiTable>
+
+            <!-- Загрузить ещё -->
+            <div v-if="store.hasMore" class="apartments__table-footer">
+              <UiButton @click="store.loadMore">Загрузить ещё</UiButton>
+              <!-- <button class="" @click="store.loadMore">Загрузить ещё</button> -->
+            </div>
+          </div>
+
+          <!-- Фильтр -->
+          <div class="apartments__filter">
+            <FiltersPanel />
+          </div>
         </div>
       </div>
-    </div>
+    </ClientOnly>
   </PageSection>
 </template>
 
@@ -163,9 +81,9 @@ function loadMore() {
     line-height: 55px;
   }
 
-  &__content {
+  &__content,
+  &__skeleton {
     display: flex;
-    align-items: center;
     justify-content: space-between;
     gap: 80px;
     margin-top: 48px;
@@ -175,15 +93,60 @@ function loadMore() {
     width: 100%;
   }
 
+  &__table-image {
+    width: 100%;
+    padding: 0 10px;
+  }
+
+  &__table-footer {
+    margin-top: 48px;
+  }
+
   &__filter {
     flex: 0 0 auto;
     width: 400px;
-    height: 200px;
-    background: linear-gradient(
-      135deg,
-      rgba(174, 228, 178, 0.3) 0%,
-      rgba(149, 208, 161, 0.3) 100%
-    );
+    // height: 200px;
+  }
+}
+
+/* 🔹 Skeleton */
+.skeleton-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.skeleton-cell {
+  flex: 1;
+  height: 40px;
+  border-radius: 6px;
+  background: #e0e0e0;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-filter {
+  margin-top: 20px;
+  height: 40px;
+  border-radius: 6px;
+  background: #e0e0e0;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.apartments__skeleton .apartments__filter {
+  background: #c6c6c6;
+  padding: 40px;
+  border-radius: 10px;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
   }
 }
 </style>

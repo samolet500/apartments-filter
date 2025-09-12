@@ -1,4 +1,4 @@
-export interface IColumn {
+export interface ITableColumn {
   label: string;
   prop: string;
   width?: string;
