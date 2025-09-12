@@ -38,6 +38,11 @@ const handleClick = () => {
   line-height: 100%;
   text-align: center;
   cursor: pointer;
+  transition: 0.3s;
+
+  &:not(.selected):hover {
+    box-shadow: 0px 6px 20px 0px #cbe0d0;
+  }
 
   &.selected {
     background: $color-green;
