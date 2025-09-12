@@ -75,6 +75,9 @@ const resetFilters = () => store.resetFilters();
     rgba(174, 228, 178, 0.3) 0%,
     rgba(149, 208, 161, 0.3) 100%
   );
+  @media (max-width: 1280px) {
+    padding: 20px;
+  }
 
   &__room-switchers {
     display: flex;

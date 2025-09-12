@@ -104,7 +104,7 @@ function updateValue(val: [number, number]) {
         color: $color-black;
         opacity: 0.5;
         font-size: 16px;
-        line-height: 24px;
+        line-height: 1;
         margin-right: 6px;
         display: inline-block;
         vertical-align: middle;
@@ -126,7 +126,7 @@ function updateValue(val: [number, number]) {
         color: $color-black;
         opacity: 0.5;
         font-size: 16px;
-        line-height: 24px;
+        line-height: 1;
         margin-right: 6px;
         display: inline-block;
         vertical-align: middle;
