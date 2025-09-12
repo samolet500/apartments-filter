@@ -30,7 +30,7 @@ export const useApartmentsStore = defineStore('apartments', () => {
 
   async function loadApartments() {
     // Имитация задержки в 2 секунды, чтобы показать загрузку
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
     const data = await $fetch<IApartment[]>("/apartments.json")
     const adapterData = adapterApartmentData(data)
