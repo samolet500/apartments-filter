@@ -2,6 +2,7 @@
 import { useApartmentsStore } from "~/stores/apartments.store";
 
 const store = useApartmentsStore();
+
 const rooms = computed(() => store.defaultFilterRooms);
 
 const isRoomSelected = (room: number) => store.filterRooms.includes(room);
@@ -20,20 +21,14 @@ const resetFilters = () => store.resetFilters();
 <template>
   <div class="filters-panel">
     <!-- Кол-во комнат -->
-    <div class="filters-panel__room-switcher room-switcher">
-      <div class="room-switcher__buttons">
-        <button
-          v-for="room in rooms"
-          :key="room"
-          :class="[
-            'room-switcher__button',
-            isRoomSelected(room) ? 'selected' : '',
-          ]"
-          @click="toggleRoom(room)"
-        >
-          {{ room }}к
-        </button>
-      </div>
+    <div class="filters-panel__room-switchers">
+      <UiSwitcherButton
+        v-for="room in rooms"
+        :key="room"
+        :room="room"
+        :is-selected="isRoomSelected(room)"
+        @toggle="toggleRoom"
+      />
     </div>
 
     <!-- Цена -->
@@ -81,6 +76,13 @@ const resetFilters = () => store.resetFilters();
     rgba(149, 208, 161, 0.3) 100%
   );
 
+  &__room-switchers {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 16px;
+  }
+
   &__reset {
     display: flex;
     align-items: center;
@@ -97,45 +99,6 @@ const resetFilters = () => store.resetFilters();
 
     &:hover {
       opacity: 0.5;
-    }
-  }
-}
-
-.room-switcher {
-  &__buttons {
-    display: flex;
-    align-items: center;
-    justify-content: start;
-    gap: 16px;
-  }
-
-  &__button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 auto;
-    width: 44px;
-    height: 44px;
-    border: none;
-    border-radius: 50%;
-    background: $color-white;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 100%;
-    text-align: center;
-    cursor: pointer;
-
-    &.selected {
-      background: $color-green;
-      box-shadow: 0px 6px 20px 0px #95d0a1;
-      color: $color-white;
-    }
-
-    &.default {
-      background: $color-white;
-      box-shadow: none;
-      color: gray;
-      pointer-events: none;
     }
   }
 }
