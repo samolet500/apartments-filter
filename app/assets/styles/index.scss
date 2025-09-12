@@ -9,3 +9,13 @@ body {
   margin: 0;
   font-family: $font-primary;
 }
+
+.text-thin {
+  color: $color-black;
+  opacity: 50%;
+}
+
+.text-bold {
+  color: $color-black;
+  font-weight: 500;
+}

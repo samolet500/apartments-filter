@@ -15,10 +15,19 @@ export default defineNuxtConfig({
   image: {
     dir: 'assets/images'
   },
+  icon: {
+    customCollections: [
+      {
+        prefix: 'icon',
+        dir: './app/assets/icons'
+      },
+    ],
+  },
   modules: [
     '@nuxt/eslint',
     '@nuxt/fonts',
     '@nuxt/icon',
-    '@nuxt/image'
+    '@nuxt/image',
+    '@pinia/nuxt'
   ]
 })
